@@ -3,7 +3,7 @@ import datetime, json, os, re, time, urllib.request, urllib.error
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DATA = ROOT / "site" / "data"
+DATA = ROOT / "docs" / "data"
 
 
 def load(name):

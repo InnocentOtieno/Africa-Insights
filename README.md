@@ -5,7 +5,7 @@ A public African markets terminal covering 32 exchanges, FX and rates, the Afric
 It is a static site on Cloudflare Pages, plus two small serverless functions. A GitHub Action refreshes the data on a schedule and redeploys the site. There are no servers to maintain.
 
 ```
-site/                  what the public sees (Cloudflare Pages output folder)
+docs/                  what the public sees (Cloudflare Pages output folder)
   index.html           the terminal (generated; do not edit by hand)
   assets/              app.js, styles.css, favicon, og.png
   data/*.json          the live data the terminal polls every 60 seconds
@@ -27,7 +27,7 @@ templates/index.html   the terminal page template
 
 ### 2. Create the Cloudflare Pages site
 1. Create a free account at dash.cloudflare.com, then go to **Workers & Pages → Create → Pages → Connect to Git** and pick the repo.
-2. Build settings: **Framework preset** None · **Build command** leave empty · **Build output directory** `site`. Click **Save and Deploy**.
+2. Build settings: **Framework preset** None · **Build command** leave empty · **Build output directory** `docs`. Click **Save and Deploy**.
 3. You get a URL like `https://africa-insights.pages.dev`. The terminal works from this point on, with the AI analyst and feedback switched off until step 3.
 
 ### 3. Switch on feedback and the AI analyst
@@ -64,7 +64,7 @@ Then go to **Actions → Refresh data and rebuild → Run workflow** to test it.
 
 Each run commits changed data, rebuilds all pages, and Cloudflare redeploys in about a minute. Open terminals pick up the new data within 60 seconds and show **Live · updated N min ago**.
 
-**Safety checks.** An index move over 12%, a commodity move over 15%, an FX move over 25%, a policy-rate change over 5pp, stale dates and malformed stories are all **held back** rather than published. They are listed in `site/data/meta.json → flags` for you to review. Year-to-date returns are always recomputed from the 31 Dec 2025 bases in `bases.json`, never copied from a source. To accept a genuine big move (such as a devaluation), edit the JSON by hand or run the FX job with `FORCE=1`.
+**Safety checks.** An index move over 12%, a commodity move over 15%, an FX move over 25%, a policy-rate change over 5pp, stale dates and malformed stories are all **held back** rather than published. They are listed in `docs/data/meta.json → flags` for you to review. Year-to-date returns are always recomputed from the 31 Dec 2025 bases in `bases.json`, never copied from a source. To accept a genuine big move (such as a devaluation), edit the JSON by hand or run the FX job with `FORCE=1`.
 
 ### 5. Custom domain
 In Pages, go to **Custom domains → Set up a domain** and enter, for example, `africainsights.com` or `markets.yourdomain.com`. If the domain's DNS is on Cloudflare this takes one click; otherwise add the CNAME it shows you. Then update the `SITE_URL` variable in GitHub and run the workflow once so the canonical URLs, sitemap and social cards use the new domain.
@@ -91,7 +91,7 @@ This is not legal advice, so have counsel confirm each point for your markets.
 - **Billionaire content.** It comes from public Forbes rankings. Keep it factual and sourced.
 
 ## Editing
-- Data: edit `site/data/*.json`, then run `python scripts/build.py` (or let the Action do it).
-- Terminal UI: `site/assets/app.js`, `site/assets/styles.css` and `templates/index.html`, then run `python scripts/build.py`.
+- Data: edit `docs/data/*.json`, then run `python scripts/build.py` (or let the Action do it).
+- Terminal UI: `docs/assets/app.js`, `docs/assets/styles.css` and `templates/index.html`, then run `python scripts/build.py`.
 - Scenario model coefficients (`BETA`) and volatility assumptions (`VOL`) are at the top of `app.js`.
-- Local preview: `npx wrangler pages dev site --kv KV` opens the site with working functions at http://localhost:8788.
+- Local preview: `npx wrangler pages dev docs --kv KV` opens the site with working functions at http://localhost:8788.

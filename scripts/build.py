@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Build the static Africa Insights site from site/data/*.json.
+"""Build the static Africa Insights site from docs/data/*.json.
 
-Writes: site/index.html, site/markets/**, site/news/, site/feed.xml,
-site/sitemap.xml, site/robots.txt, site/terms/, site/privacy/, site/404.html.
+Writes: docs/index.html, docs/markets/**, docs/news/, docs/feed.xml,
+docs/sitemap.xml, docs/robots.txt, docs/terms/, docs/privacy/, docs/404.html.
 Run after every data refresh. Needs only the Python standard library.
 """
 import html, json, math, os, re, hashlib, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SITE_DIR = ROOT / "site"
+SITE_DIR = ROOT / "docs"
 DATA = SITE_DIR / "data"
 TPL = ROOT / "templates" / "index.html"
 SITE = os.environ.get("SITE_URL", "https://africa-insights.pages.dev").rstrip("/")
