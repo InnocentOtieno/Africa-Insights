@@ -1,0 +1,6 @@
+scripts/.urls.json
+__pycache__/
+*.pyc
+.wrangler/
+node_modules/
+.DS_Store

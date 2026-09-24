@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>{{TITLE}}</title>
+<meta name="description" content="{{DESC}}">
+<link rel="canonical" href="{{SITE}}/">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="theme-color" content="#0F141B">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Africa Insights">
+<meta property="og:title" content="{{TITLE}}"><meta property="og:description" content="{{DESC}}">
+<meta property="og:url" content="{{SITE}}/"><meta property="og:image" content="{{SITE}}/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{{TITLE}}"><meta name="twitter:description" content="{{DESC}}"><meta name="twitter:image" content="{{SITE}}/assets/og.png">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="Africa Insights newswire" href="/feed.xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/assets/styles.css?v={{VER}}">
+<script type="application/ld+json">{{JSONLD}}</script>
+<!-- Cloudflare Web Analytics: paste your beacon snippet here after enabling it in the dashboard -->
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="/" style="text-decoration:none;color:inherit"><b>AFRICA <i>INSIGHTS</i></b><span>Markets terminal</span></a>
+    <form class="cmd" id="cmdForm" autocomplete="off">
+      <label for="cmd">GO&gt;</label>
+      <input id="cmd" list="cmdList" placeholder="NGX, KES, FX, SCN… or ask a question">
+      <datalist id="cmdList"></datalist>
+    </form>
+    <div class="spacer"></div>
+    <span class="pill" id="feedPill"><span class="dot snap"></span><span id="feedTxt">Snapshot</span></span>
+    <span class="clock" id="clock"></span>
+    <button class="btn" id="fbBtn" type="button">Feedback</button>
+  </header>
+
+  <div class="tape" aria-label="Market tape"><div class="tape-inner" id="tape"></div></div>
+
+  <nav class="fn" role="tablist" id="fn"></nav>
+
+  <!-- MKT -->
+  <section class="tab" id="t-mkt" role="tabpanel">
+    <div class="panel">
+      <div class="hero">
+        <div class="hero-left">
+          <div class="eyebrow">Africa Insights Composite · AIC · USD · base 1,000 = 31 Dec 2025</div>
+          <div class="big" id="kacLevel">—</div>
+          <div class="chg" id="kacChg"></div>
+          <dl class="kv" id="kacKv"></dl>
+          <p class="note" id="kacNote"></p>
+        </div>
+        <div class="hero-right">
+          <div class="ph" style="padding:0 0 8px;border:0"><h2>What drove the composite in 2026</h2><span class="sub">Contribution to KAC USD return, pp</span></div>
+          <div id="contrib"></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="panel c7">
+        <div class="ph"><h2>Market map</h2><span class="sub">Area ∝ √ market cap · colour = 2026 USD return</span></div>
+        <div class="pb"><div class="tm" id="treemap"></div><div class="legend" id="tmLegend" style="margin-top:8px"></div></div>
+      </div>
+      <div class="panel c5">
+        <div class="ph"><h2>Commodities that move Africa</h2><span class="sub" id="comDate"></span></div>
+        <div class="pb tw"><table id="comTbl"></table></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="ph"><h2>Exchange board</h2><span class="sub">32 African venues · click a row for detail</span>
+        <div class="right"><div class="seg" id="boardFilter"><button aria-pressed="true" data-v="all">All</button><button aria-pressed="false" data-v="data">With index data</button><button aria-pressed="false" data-v="dark">Data gaps</button></div></div></div>
+      <div class="tw"><table id="board"></table></div>
+    </div>
+  </section>
+
+  <!-- FX -->
+  <section class="tab" id="t-fx" role="tabpanel" hidden>
+    <div class="grid">
+      <div class="panel c7">
+        <div class="ph"><h2>Carry map</h2><span class="sub">Real policy rate vs 2026 FX move · bubble = GDP growth forecast</span></div>
+        <div class="pb" id="carryChart"></div>
+      </div>
+      <div class="panel c5">
+        <div class="ph"><h2>Carry arithmetic</h2><span class="sub" id="usdNote"></span></div>
+        <div class="pb" id="carryRank"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="ph"><h2>Currencies and rates</h2><span class="sub" id="fxDate"></span></div>
+      <div class="tw"><table id="fxTbl"></table></div>
+    </div>
+  </section>
+
+  <!-- MOVERS -->
+  <section class="tab" id="t-mov" role="tabpanel" hidden>
+    <div class="panel">
+      <div class="ph"><h2>Market movers, USD-adjusted</h2><span class="sub">Local YTD converted through the currency move. Stocks under $50m cap are flagged as liquidity traps.</span>
+        <div class="right"><select id="movEx" aria-label="Exchange"></select><div class="seg" id="movCat"><button aria-pressed="true" data-v="all">All</button><button aria-pressed="false" data-v="gainer">Gainers</button><button aria-pressed="false" data-v="loser">Losers</button><button aria-pressed="false" data-v="largecap">Large caps</button></div></div></div>
+      <div class="pb" id="movChart"></div>
+      <div class="tw"><table id="movTbl"></table></div>
+    </div>
+  </section>
+
+  <!-- IDEAS -->
+  <section class="tab" id="t-ide" role="tabpanel" hidden>
+    <div class="grid">
+      <div class="panel c7">
+        <div class="ph"><h2>Where the gap is</h2><span class="sub">Opportunity score vs investability · top-left = underutilised</span></div>
+        <div class="pb" id="quad"></div>
+      </div>
+      <div class="panel c5">
+        <div class="ph"><h2>Score ranking</h2><span class="sub">0–100, recomputed on every data refresh</span></div>
+        <div class="pb tw"><table id="scoreTbl"></table></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="ph"><h2>Trade and investment ideas</h2><span class="sub">Rules-based from the live data and the calendar. Research prompts, not advice.</span>
+        <div class="right"><div class="seg" id="ideaType"></div><select id="ideaAud" aria-label="Audience"><option value="all">All desks</option><option>Quant</option><option>Hedge fund</option><option>PE / VC</option></select></div></div>
+      <div class="pb"><div class="cards" id="ideas"></div></div>
+    </div>
+  </section>
+
+  <!-- SCENARIO -->
+  <section class="tab" id="t-scn" role="tabpanel" hidden>
+    <div class="panel">
+      <div class="ph"><h2>Scenario lab</h2><span class="sub">Shock global and political drivers and see how the shock passes through each exchange in USD</span><div class="right"><button class="btn" id="scnReset">Reset</button></div></div>
+      <div class="pb" style="display:flex;flex-direction:column;gap:14px">
+        <div class="presets" id="presets"></div>
+        <div class="sliders" id="sliders"></div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="panel c7">
+        <div class="ph"><h2>Estimated 12-month USD impact</h2><span class="sub" id="scnSum"></span></div>
+        <div class="pb" id="scnBars"></div>
+      </div>
+      <div class="panel c5">
+        <div class="ph"><h2>Positioning read-out</h2><span class="sub">What the shock implies</span></div>
+        <div class="pb" id="scnRead"></div>
+      </div>
+      <div class="panel c7">
+        <div class="ph"><h2>Path distribution</h2><span class="sub">2,000 simulated 12-month paths</span><div class="right"><select id="fanMkt" aria-label="Market"></select></div></div>
+        <div class="pb" id="fan"></div>
+      </div>
+      <div class="panel c5">
+        <div class="ph"><h2>Your book under this scenario</h2><span class="sub">Enter weights in % (negative = short)</span></div>
+        <div class="pb" id="book"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RISK -->
+  <section class="tab" id="t-rsk" role="tabpanel" hidden>
+    <div class="panel">
+      <div class="ph"><h2>Shock transmission</h2><span class="sub">How each global driver passes into each exchange (USD return per unit shock). This is the matrix the scenario lab uses.</span></div>
+      <div class="pb tw" id="heat"></div>
+    </div>
+    <div class="grid">
+      <div class="panel c5">
+        <div class="ph"><h2>PESTLE country board</h2><span class="sub">Highest flagged risk per factor, 1–5</span></div>
+        <div class="pb tw" id="pestle"></div>
+      </div>
+      <div class="panel c7">
+        <div class="ph"><h2>Political and policy calendar</h2><span class="sub">Catalysts that position sizing should respect</span><div class="right"><select id="calF" aria-label="PESTLE filter"><option value="all">All factors</option><option>Political</option><option>Economic</option><option>Legal</option></select></div></div>
+        <div class="pb" id="cal"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWS -->
+  <section class="tab" id="t-nws" role="tabpanel" hidden>
+    <div class="grid">
+      <div class="panel c4">
+        <div class="ph"><h2>Signal tally by sector</h2><span class="sub">Bullish vs bearish stories, weighted by impact</span></div>
+        <div class="pb" id="tally"></div>
+      </div>
+      <div class="panel c8">
+        <div class="ph"><h2>Newswire</h2><span class="sub" id="nwsCount"></span>
+          <div class="right"><input class="inp" id="nwsQ" placeholder="Filter: Nigeria, IPO, SCOM…" aria-label="Filter stories"><select id="nwsSec" aria-label="Sector"></select><select id="nwsSig" aria-label="Signal"><option value="all">All signals</option><option value="bullish">Bullish</option><option value="bearish">Bearish</option><option value="neutral">Neutral</option></select></div></div>
+        <div class="pb" id="news" style="display:flex;flex-direction:column;gap:12px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RICH -->
+  <section class="tab" id="t-ric" role="tabpanel" hidden>
+    <div class="grid">
+      <div class="panel c7">
+        <div class="ph"><h2>Africa's richest</h2><span class="sub" id="richSum"></span></div>
+        <div class="pb" id="richBars"></div>
+      </div>
+      <div class="panel c5">
+        <div class="ph"><h2>Wealth by listing venue</h2><span class="sub">Where billionaire wealth is exposed to listed prices</span></div>
+        <div class="pb" id="richVenue"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="ph"><h2>Holdings and what moves them</h2><span class="sub">Venue USD YTD shows how that market has moved this year</span></div>
+      <div class="tw"><table id="richTbl"></table></div>
+    </div>
+  </section>
+
+  <!-- DESK -->
+  <section class="tab" id="t-dsk" role="tabpanel" hidden>
+    <div class="panel">
+      <div class="ph"><h2>Ask the desk</h2><span class="sub">An AI analyst answers from the terminal's current data. Answers are research prompts, not advice.</span></div>
+      <div class="pb" style="display:flex;flex-direction:column;gap:10px">
+        <div class="presets" id="deskPresets"></div>
+        <div class="chat" id="chat"></div>
+        <form class="ask" id="askForm"><textarea id="askQ" placeholder="e.g. Build a 5-market frontier basket that survives a Fed hike and an oil spike"></textarea><button class="btn pri" type="submit" id="askBtn">Ask</button></form>
+        <p class="note" id="deskNote"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- METHOD -->
+  <section class="tab" id="t-met" role="tabpanel" hidden>
+    <div class="panel"><div class="pb prose" id="method"></div></div>
+  </section>
+
+  <section class="panel"><div class="pb seo" id="seo"><!--SEO--></div></section>
+  <p class="foot" id="foot"></p>
+</div>
+<div class="drawer" id="drawer" hidden><div class="dp" id="dp" role="dialog" aria-modal="true" aria-label="Market detail"></div></div>
+<div class="modal" id="fbModal" hidden><form id="fbForm" aria-labelledby="fbTitle">
+  <h2 id="fbTitle">Send feedback</h2>
+  <label class="field" for="fbType">What is it about?<select id="fbType"><option>General feedback</option><option>Data error</option><option>Request a market or feature</option><option>Bug</option></select></label>
+  <div class="field"><span>How useful is Africa Insights?</span><div class="stars" id="fbStars"></div></div>
+  <label class="field" for="fbMsg">Message<textarea id="fbMsg" rows="4" maxlength="2000" placeholder="e.g. The NSE level looks stale, or please add BVMAC stock prices"></textarea></label>
+  <label class="field" for="fbEmail">Email (optional, only if you want a reply)<input id="fbEmail" type="email" maxlength="200" autocomplete="email"></label>
+  <input id="fbHp" type="text" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+  <div class="meta"><button class="btn pri" id="fbSend" type="submit">Send</button><button class="btn" id="fbCancel" type="button">Cancel</button><span id="fbStatus" class="note" role="status"></span></div>
+</form></div>
+<script id="snap" type="application/json">{{SNAP}}</script>
+<script src="/assets/app.js?v={{VER}}" defer></script>
+</body>
+</html>

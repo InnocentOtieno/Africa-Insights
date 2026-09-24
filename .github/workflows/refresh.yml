@@ -1,0 +1,81 @@
+name: Refresh data and rebuild
+
+on:
+  schedule:
+    - cron: "15 */6 * * *"        # FX every 6 hours (the free source updates daily)
+    - cron: "30 5,15 * * 1-5"     # markets + news, 08:30 and 18:30 EAT on weekdays
+    - cron: "0 9 * * 6,0"         # weekend news sweep
+    - cron: "0 4 * * 1"           # macro, Mondays
+  workflow_dispatch:
+    inputs:
+      jobs:
+        description: "Jobs to run (fx markets news macro)"
+        default: "fx markets news"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SITE_URL: ${{ vars.SITE_URL }}
+      INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Pick jobs
+        id: pick
+        run: |
+          S="${{ github.event.schedule }}"
+          case "$S" in
+            "15 */6 * * *")   J="fx" ;;
+            "30 5,15 * * 1-5") J="fx markets news" ;;
+            "0 9 * * 6,0")    J="news" ;;
+            "0 4 * * 1")      J="macro" ;;
+            *)                J="${{ github.event.inputs.jobs }}" ;;
+          esac
+          echo "jobs=$J" >> "$GITHUB_OUTPUT"
+          echo "Running: $J"
+
+      - name: FX
+        if: contains(steps.pick.outputs.jobs, 'fx')
+        run: python scripts/refresh_fx.py
+        continue-on-error: true
+
+      - name: Markets, news and macro (Claude + web search)
+        if: env.ANTHROPIC_API_KEY != '' && (contains(steps.pick.outputs.jobs, 'markets') || contains(steps.pick.outputs.jobs, 'news') || contains(steps.pick.outputs.jobs, 'macro'))
+        run: |
+          A=""
+          for j in markets news macro; do case " ${{ steps.pick.outputs.jobs }} " in *" $j "*) A="$A $j";; esac; done
+          python scripts/refresh_ai.py $A
+        continue-on-error: true
+
+      - name: Build site
+        run: python scripts/build.py
+
+      - name: Commit and push
+        id: commit
+        run: |
+          git config user.name "africa-insights-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -A site
+          if git diff --cached --quiet; then echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          git commit -m "data: refresh ${{ steps.pick.outputs.jobs }} $(date -u +%FT%TZ)"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Ping IndexNow
+        if: steps.commit.outputs.changed == 'true' && env.INDEXNOW_KEY != ''
+        run: python scripts/indexnow.py
+        continue-on-error: true
